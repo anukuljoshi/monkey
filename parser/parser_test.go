@@ -7,16 +7,18 @@ import (
 	"github.com/anukuljoshi/monkey/lexer"
 )
 
-func TestLetStatement(t *testing.T) {
+func TestLetStatements(t *testing.T) {
 	input := `
 		let x = 5;
 		let y = 15;
 		let foobar = 12345;
 	`
+
 	l := lexer.New(input)
 	p := New(l)
 	program := p.ParseProgram()
 	checkParserErrors(t, p)
+
 	if program == nil {
 		t.Fatalf("ParseProgram() returned nil")
 	}
@@ -57,6 +59,51 @@ func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 	}
 	if letStmt.Name.TokenLiteral() != name {
 		t.Errorf("letStmt.Name not '%s', got=%s", name, letStmt.Name)
+		return false
+	}
+	return true
+}
+
+func TestReturnStatements(t *testing.T) {
+	input := `
+		return 5;
+		return 15;
+		return add(a, b);
+	`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if program == nil {
+		t.Fatalf("ParseProgram() returned nil")
+	}
+	if len(program.Statements) != 3 {
+		t.Fatalf("program.Statements does not contain 3 statements, got=%d",
+			len(program.Statements))
+	}
+
+	for _, stmt := range program.Statements {
+		returnStmt, ok := stmt.(*ast.ReturnStatement)
+		if !ok {
+			t.Errorf("stmt not *ast.ReturnStatement, got=%T", stmt)
+		}
+		if returnStmt.TokenLiteral() != "return" {
+			t.Errorf("returnStmt.TokenLiteral() not 'return' got=%q",
+				returnStmt.TokenLiteral())
+		}
+	}
+}
+
+func testReturnStatement(t *testing.T, s ast.Statement, name string) bool {
+	if s.TokenLiteral() != "let" {
+		t.Errorf("s.TokenLiteral() is not 'let', got=%q", s.TokenLiteral())
+		return false
+	}
+	_, ok := s.(*ast.ReturnStatement)
+	if !ok {
+		t.Errorf("s is not *ast.ReturnStatement, got=%T", s)
 		return false
 	}
 	return true
