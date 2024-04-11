@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/anukuljoshi/monkey/ast"
+	"github.com/anukuljoshi/monkey/token"
 )
 
 func (p *Parser) parseIdentifer() ast.Expression {
@@ -24,6 +25,13 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 	}
 	lit.Value = value
 	return lit
+}
+
+func (p *Parser) parseBoolean() ast.Expression {
+	return &ast.Boolean{
+		Token: p.curToken,
+		Value: p.curTokenIs(token.TRUE),
+	}
 }
 
 func (p *Parser) parsePrefixExpression() ast.Expression {
@@ -47,3 +55,14 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 	expression.Right = p.parseExpression(precendence)
 	return expression
 }
+
+func (p *Parser) parseGroupedExpression() ast.Expression {
+	p.nextToken()
+
+	exp := p.parseExpression(LOWEST)
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+	return exp
+}
+

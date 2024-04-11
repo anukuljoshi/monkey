@@ -21,6 +21,7 @@ type Expression interface {
 	expressionNode()
 }
 
+// root Program
 type Program struct {
 	Statements []Statement
 }
@@ -32,7 +33,6 @@ func (p *Program) TokenLiteral() string {
 		return ""
 	}
 }
-
 func (p *Program) String() string {
 	var out bytes.Buffer
 
@@ -42,6 +42,7 @@ func (p *Program) String() string {
 	return out.String()
 }
 
+// let statement
 type LetStatement struct {
 	Token token.Token // token.LET token
 	Name  *Identifier
@@ -66,6 +67,7 @@ func (ls *LetStatement) String() string {
 	return out.String()
 }
 
+// identifier
 type Identifier struct {
 	Token token.Token // token.IDENT token
 	Value string
@@ -79,6 +81,7 @@ func (i *Identifier) String() string {
 	return i.Value
 }
 
+// return statement
 type ReturnStatement struct {
 	Token       token.Token // token.RETURN
 	ReturnValue Expression
@@ -100,6 +103,7 @@ func (rs *ReturnStatement) String() string {
 	return out.String()
 }
 
+// expression statement
 type ExpressionStatement struct {
 	Token      token.Token // first token of the expression
 	Expression Expression
@@ -116,6 +120,7 @@ func (es *ExpressionStatement) String() string {
 	return ""
 }
 
+// integer literal
 type IntegerLiteral struct {
 	Token token.Token // token.INT token
 	Value int64
@@ -129,6 +134,7 @@ func (il *IntegerLiteral) String() string {
 	return il.Token.Literal
 }
 
+// prefix expression
 type PrefixExpression struct {
 	Token    token.Token // the prefix token : !, -
 	Operator string
@@ -148,6 +154,7 @@ func (pe *PrefixExpression) String() string {
 	return out.String()
 }
 
+// infix expression
 type InfixExpression struct {
 	Token    token.Token // the operator token: +, -, *
 	Left     Expression
@@ -167,4 +174,18 @@ func (ie *InfixExpression) String() string {
 	out.WriteString(ie.Right.String())
 	out.WriteString(")")
 	return out.String()
+}
+
+// boolean literal
+type Boolean struct {
+	Token token.Token
+	Value bool
+}
+
+func (b *Boolean) expressionNode() {}
+func (b *Boolean) TokenLiteral() string {
+	return b.Token.Literal
+}
+func (b *Boolean) String() string {
+	return b.Token.Literal
 }
