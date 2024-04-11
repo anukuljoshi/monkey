@@ -27,6 +27,7 @@ var precendences = map[token.TokenType]int{
 	token.MINUS:    SUM,
 	token.FSLASH:   PRODUCT,
 	token.ASTERISK: PRODUCT,
+	token.LPAREN: CALL,
 }
 
 type (
@@ -77,6 +78,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
+	p.registerInfix(token.LPAREN, p.parseCallExpression)
 	return p
 }
 
