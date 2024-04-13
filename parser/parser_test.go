@@ -10,10 +10,10 @@ import (
 
 func TestLetStatements(t *testing.T) {
 	tests := []struct {
-		input string
+		input              string
 		expectedIdentifier string
-		expectedValue interface{}
-	} {
+		expectedValue      interface{}
+	}{
 		{"let x = 5;", "x", 5},
 		{"let y = true;", "y", true},
 		{"let foobar = y;", "foobar", "y"},
@@ -65,12 +65,12 @@ func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 
 func TestReturnStatements(t *testing.T) {
 	tests := []struct {
-		input string
+		input               string
 		expectedReturnValue interface{}
-	} {
-		{ "return 5;", 5},
-		{ "return true", true},
-		{ "return foobar", "foobar"},
+	}{
+		{"return 5;", 5},
+		{"return true", true},
+		{"return foobar", "foobar"},
 	}
 
 	for _, tt := range tests {
@@ -167,9 +167,9 @@ func TestIntegerLiteralExpression(t *testing.T) {
 
 func TestPrefixExpressions(t *testing.T) {
 	prefixTests := []struct {
-		input        string
-		operator     string
-		value interface{}
+		input    string
+		operator string
+		value    interface{}
 	}{
 		{"!5;", "!", 5},
 		{"-15;", "-", 15},
@@ -503,9 +503,9 @@ func TestBooleanExpression(t *testing.T) {
 	}
 
 	tests := []struct {
-		expectedValue bool
+		expectedValue      bool
 		expectedTokenValue string
-	} {
+	}{
 		{true, "true"},
 		{false, "false"},
 	}
@@ -612,7 +612,6 @@ func TestIfElseExpression(t *testing.T) {
 		return
 	}
 
-
 	if len(exp.Alternative.Statements) != 1 {
 		t.Fatalf("len(exp.Alternative.Statements): expected=%d, got=%d",
 			1, len(exp.Alternative.Statements))
@@ -675,9 +674,9 @@ func TestParsingFunctionLiteral(t *testing.T) {
 // test for function parameters
 func TestParsingFunctionParameters(t *testing.T) {
 	tests := []struct {
-		input string
+		input          string
 		expectedParams []string
-	} {
+	}{
 		{input: "fn() {};", expectedParams: []string{}},
 		{input: "fn(x) {};", expectedParams: []string{"x"}},
 		{input: "fn(x, y, z) {};", expectedParams: []string{"x", "y", "z"}},
@@ -726,7 +725,7 @@ func TestCallExpressionParsing(t *testing.T) {
 	exp, ok := stmt.Expression.(*ast.CallExpression)
 	if !ok {
 		t.Fatalf("stmt.Expression is not *ast.CallExpression, got=%T",
-		 stmt.Expression)
+			stmt.Expression)
 	}
 
 	if !testIdentifier(t, exp.Function, "add") {

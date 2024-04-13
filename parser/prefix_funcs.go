@@ -119,7 +119,6 @@ func (p *Parser) parseFunctionLiteral() ast.Expression {
 		return nil
 	}
 
-
 	lit.Parameters = p.parseFunctionParameters()
 
 	if !p.expectPeek(token.LBRACE) {
@@ -166,7 +165,7 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 // call expressions
 func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
 	exp := &ast.CallExpression{
-		Token: p.curToken,
+		Token:    p.curToken,
 		Function: function,
 	}
 	exp.Arguments = p.parseCallArguments()

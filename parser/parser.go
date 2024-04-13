@@ -27,7 +27,7 @@ var precendences = map[token.TokenType]int{
 	token.MINUS:    SUM,
 	token.FSLASH:   PRODUCT,
 	token.ASTERISK: PRODUCT,
-	token.LPAREN: CALL,
+	token.LPAREN:   CALL,
 }
 
 type (
