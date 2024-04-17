@@ -271,3 +271,31 @@ func TestLeftStatements(t *testing.T) {
 		testIntegerObject(t, testEval(tt.input), tt.expected)
 	}
 }
+
+// functions
+func TestFunctionObject(t *testing.T) {
+	input := "fn(x) { x + 2 };"
+
+	evaluated := testEval(input)
+	fn, ok := evaluated.(*object.Function)
+	if !ok {
+		t.Fatalf("evaluated is not a *object.Function, got=%T (%+v)",
+			evaluated, evaluated)
+	}
+
+	if len(fn.Parameters) != 1 {
+		t.Fatalf("len(fn.Parameters): expected=%d, got=%d",
+			1, len(fn.Parameters))
+	}
+
+	if fn.Parameters[0].String() != "x" {
+		t.Fatalf("fn.Parameters[0].String(): expected=%q, got=%q",
+			"x", fn.Parameters[0].String())
+	}
+
+	expectedBody := "(x + 2)"
+	if fn.Body.String() != expectedBody {
+		t.Fatalf("fn.Body.String(): expected=%q, got=%q",
+			expectedBody, fn.Body.String())
+	}
+}
