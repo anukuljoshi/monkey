@@ -98,6 +98,12 @@ func TestEvalBooleanExpression(t *testing.T) {
 		{"(1 < 2) == false", false},
 		{"(1 > 2) == true", false},
 		{"(1 > 2) == false", true},
+		{`"foo" == "foo"`, true},
+		{`"foo" == "bar"`, false},
+		{`"foo" != "foo"`, false},
+		{`"foo" != "bar"`, true},
+		{`"aa" > "bb"`, false},
+		{`"aa" < "bb"`, true},
 	}
 
 	for _, tt := range tests {
@@ -236,6 +242,10 @@ func TestErrorHandling(t *testing.T) {
 			"foobar",
 			"identifier not found: foobar",
 		},
+		{
+			`"hello" - "world"`,
+			"unknown operator: STRING - STRING",
+		},
 	}
 
 	for _, tt := range tests {
@@ -350,6 +360,22 @@ func TestEvalStringExpression(t *testing.T) {
 	}{
 		{`"foobar"`, "foobar"},
 		{`"foo bar"`, "foo bar"},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		testStringObject(t, evaluated, tt.expected)
+	}
+}
+
+func TestStringConcatenation(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{`"foo" + "bar"`, "foobar"},
+		{`"foo " + "bar"`, "foo bar"},
+		{`"foo" + " " + "bar"`, "foo bar"},
 	}
 
 	for _, tt := range tests {
