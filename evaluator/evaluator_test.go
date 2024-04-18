@@ -328,3 +328,32 @@ func TestClosures(t *testing.T) {
 	`
 	testIntegerObject(t, testEval(input), 4)
 }
+
+func testStringObject(t *testing.T, obj object.Object, expected string) bool {
+	result, ok := obj.(*object.String)
+	if !ok {
+		t.Errorf("obj is not *object.String, got=%T", obj)
+		return false
+	}
+	if result.Value != expected {
+		t.Errorf("result.Value: expected=%s, got=%s", expected, result.Value)
+		return false
+	}
+	return true
+}
+
+// string
+func TestEvalStringExpression(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{`"foobar"`, "foobar"},
+		{`"foo bar"`, "foo bar"},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		testStringObject(t, evaluated, tt.expected)
+	}
+}
