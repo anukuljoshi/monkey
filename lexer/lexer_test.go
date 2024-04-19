@@ -27,6 +27,9 @@ func TestNextToken(*testing.T) {
 		10 != 9;
 		"foobar";
 		"foo bar";
+		[1, 2, 3, "abc def", true];
+		myArray[1];
+		[1, 2, 3][2];
 	`
 	tests := []struct {
 		expectedType    token.TokenType
@@ -131,9 +134,40 @@ func TestNextToken(*testing.T) {
 		// "foobar"
 		{token.STRING, "foobar"},
 		{token.SEMICOLON, ";"},
+		// "foo bar"
 		{token.STRING, "foo bar"},
 		{token.SEMICOLON, ";"},
-		// "foo bar"
+		// [1, 2, 3, "abc def", true];
+		{token.LBRACKET, "["},
+		{token.INT, "1"},
+		{token.COMMA, ","},
+		{token.INT, "2"},
+		{token.COMMA, ","},
+		{token.INT, "3"},
+		{token.COMMA, ","},
+		{token.STRING, "abc def"},
+		{token.COMMA, ","},
+		{token.TRUE, "true"},
+		{token.RBRACKET, "]"},
+		{token.SEMICOLON, ";"},
+		// myArray[1];
+		{token.IDENT, "myArray"},
+		{token.LBRACKET, "["},
+		{token.INT, "1"},
+		{token.RBRACKET, "]"},
+		{token.SEMICOLON, ";"},
+		// [1, 2, 3][2];
+		{token.LBRACKET, "["},
+		{token.INT, "1"},
+		{token.COMMA, ","},
+		{token.INT, "2"},
+		{token.COMMA, ","},
+		{token.INT, "3"},
+		{token.RBRACKET, "]"},
+		{token.LBRACKET, "["},
+		{token.INT, "2"},
+		{token.RBRACKET, "]"},
+		{token.SEMICOLON, ";"},
 		// eof
 		{token.EOF, ""},
 	}

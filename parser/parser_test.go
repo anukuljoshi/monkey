@@ -362,6 +362,15 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 			"add(a + b + c * d / f + g)",
 			"add((((a + b) + ((c * d) / f)) + g))",
 		},
+		// array index
+		{
+			"a * [1, 2, 3, 4][b * c] * d",
+			"((a * ([1, 2, 3, 4][(b * c)])) * d)",
+		},
+		{
+			"add(a * b[2], b[1], 2 * [1, 2][1])",
+			"add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))",
+		},
 	}
 	for _, tt := range tests {
 		l := lexer.New(tt.input)
@@ -742,6 +751,24 @@ func TestCallExpressionParsing(t *testing.T) {
 	testInfixExpression(t, exp.Arguments[2], 4, "+", 5)
 }
 
+func testStringLiteral(t *testing.T, sl ast.Expression, expected string) bool {
+	result, ok := sl.(*ast.StringLiteral)
+	if !ok {
+		t.Errorf("sl is not *ast.StringLiteral, got=%T (%+v)", sl, sl)
+		return false
+	}
+	if result.Value != expected {
+		t.Errorf("result.Value: expected=%s, got=%s", expected, result.Value)
+		return false
+	}
+	if result.TokenLiteral() != expected {
+		t.Errorf("result.TokenLiteral(): expected=%s, got=%s",
+			expected, result.TokenLiteral())
+		return false
+	}
+	return true
+}
+
 func TestStringLiteralExpression(t *testing.T) {
 	input := `"hello world"`
 
@@ -759,5 +786,52 @@ func TestStringLiteralExpression(t *testing.T) {
 	if literal.Value != "hello world" {
 		t.Errorf("literal.Value: expected=%q, got=%q",
 			"hello world", literal.Value)
+	}
+}
+
+func TestArrayLiteralExpression(t *testing.T) {
+	input := `[1, 2, "abc", true, 2*2]`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	stmt, _ := program.Statements[0].(*ast.ExpressionStatement)
+	literal, ok := stmt.Expression.(*ast.ArrayLiteral)
+	if !ok {
+		t.Fatalf("stmt.Expression is not *ast.ArrayLiteral, got=%T",
+			program.Statements[0])
+	}
+	if len(literal.Elements) != 5 {
+		t.Fatalf("len(literal.Elements): expected=%d, got=%d",
+			5, len(literal.Elements))
+	}
+	testIntegerLiteral(t, literal.Elements[0], 1)
+	testIntegerLiteral(t, literal.Elements[1], 2)
+	testStringLiteral(t, literal.Elements[2], "abc")
+	testBooleanLiteral(t, literal.Elements[3], true)
+	testInfixExpression(t, literal.Elements[4], 2, "*", 2)
+}
+
+func TestParsingIndexExpression(t *testing.T) {
+	input := `myArray[1+2]`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	stmt, _ := program.Statements[0].(*ast.ExpressionStatement)
+	indexExp, ok := stmt.Expression.(*ast.IndexExpression)
+	if !ok {
+		t.Fatalf("stmt.Expression is not *ast.IndexExpression, got=%T",
+			program.Statements[0])
+	}
+	if !testIdentifier(t, indexExp.Left, "myArray") {
+		return
+	}
+	if !testInfixExpression(t, indexExp.Index, 1, "+", 2) {
+		return
 	}
 }
